@@ -1,17 +1,19 @@
 import {
   IoTrashOutline,
-  IoServerOutline,
+  IoSettingsOutline,
   IoPeopleOutline,
   IoHomeOutline,
   IoPersonAddOutline,
+  IoServerOutline,
 } from "react-icons/io5";
 
 const sidePanalItems = [
-  { itemName: "Dashboard", icon: IoHomeOutline },
+  { itemName: "Overview", icon: IoHomeOutline },
   { itemName: "Register User", icon: IoPersonAddOutline },
   { itemName: "Manage Users", icon: IoPeopleOutline },
-  { itemName: "Manage DB", icon: IoServerOutline },
   { itemName: "Recycle Bin", icon: IoTrashOutline },
+  { itemName: "App Settings", icon: IoSettingsOutline },
+  { itemName: "Payslip Data", icon: IoServerOutline },
 ];
 
 const OverviewItems = [
@@ -30,17 +32,49 @@ const OverviewItems = [
 ];
 
 const userDataKeys = [
-  { width: "50px", itemName: "UserID", type: "text" },
-  { width: "100px", itemName: "Employee Name", type: "text" },
-  { width: "80px", itemName: "Email", type: "email" },
-  { width: "80px", itemName: "Date Of Birth", type: "date" },
-  { width: "60px", itemName: "Company", type: "text" },
-  { width: "60px", itemName: "Job Title", type: "text" },
-  { width: "80px", itemName: "Joining Date", type: "date" },
-  { width: "60px", itemName: "Mobile", type: "tel" },
-  { width: "80px", itemName: "Nationality", type: "text" },
-  { width: "60px", itemName: "Type", type: "text" },
-  { width: "80px", itemName: "Password", type: "text" },
+  { itemName: "UserID", type: "text" },
+  { itemName: "Employee Name", type: "text" },
+  { itemName: "Email", type: "email" },
+  { itemName: "Date Of Birth", type: "date" },
+  { itemName: "Company", type: "text" },
+  { itemName: "Job Title", type: "text" },
+  { itemName: "Joining Date", type: "date" },
+  { itemName: "Mobile", type: "tel" },
+  { itemName: "Nationality", type: "text" },
+  { itemName: "Type", type: "text" },
+  { itemName: "Password", type: "text" },
+  { itemName: "PrimaryBankAcc", type: "text" },
+  { itemName: "SecondaryBankAcc", type: "text" },
 ];
 
-export { sidePanalItems, OverviewItems, userDataKeys };
+const headers = [
+  { label: "ID", key: "ID" },
+  { label: "Term", key: "Term" },
+  { label: "Employee Name", key: "Name" },
+  { label: "Start Month Basic", key: "Basic_i" },
+  { label: "Start Month Offshore", key: "Offshore_i" },
+  { label: "Start Month Onshore", key: "Onshore_i" },
+  { label: "Start Month Transit", key: "Transit_i" },
+  { label: "End Month Basic", key: "Basic_ii" },
+  { label: "End Month Offshore", key: "Offshore_ii" },
+  { label: "End Month Onshore", key: "Onshore_ii" },
+  { label: "End Month Transit", key: "Transit_ii" },
+  {
+    label:
+      "Unrecorded Salary / Claim Baggage / Visa / Transport / Bonus / Other",
+    key: "OtherSalary_descr",
+  },
+  { label: "Amount", key: "OtherSalary_amount" },
+  { label: "Cash Advance", key: "CashAdvance" },
+  { label: "OverPay / Other", key: "OverPay_descr" },
+  { label: "Amount", key: "OverPay_amount" },
+  { label: "Secondary Bank Account", key: "SecondaryBankAcc" },
+  { label: "Grand Total", key: "GrandTotal" },
+  { label: "Deduction", key: "Deduction" },
+  { label: "Total", key: "Total" },
+];
+
+const api = "https://admin.backend.nippontechnology.com";
+// const api = "http://100.100.1.254:5000";
+
+export { sidePanalItems, OverviewItems, userDataKeys, api, headers };

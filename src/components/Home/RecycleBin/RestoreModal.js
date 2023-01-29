@@ -10,41 +10,33 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { useDataContext } from "../../../contexts/DataContext";
+import { api } from "../../../utlis/GlobalData";
 
 const RestoreModal = ({ modalStatus, setModalStatus, selectedUser }) => {
-  const { createUser, fetchUserAllData, fetchrRecyleData, deleteRecycle } =
+  const { makeToast, fetchUserAllData, fetchRecyleData, currentUser } =
     useDataContext();
-  const toast = useToast();
 
   const handleDeleteUser = () => {
-    createUser(selectedUser, selectedUser, ({ error, msg }) => {
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "User data restored successfully",
-          status: "success",
-          duration: 6000,
-          isClosable: true,
-        });
-        deleteRecycle(selectedUser.UserID, () => {
-          fetchUserAllData();
-          fetchrRecyleData();
-          setModalStatus((prev) => ({ ...prev, restoreModal: false }));
-        });
-      }
-    });
+    axios
+      .post(`${api}/db/createUser`, { user: selectedUser })
+      .then((res) => {
+        fetchUserAllData();
+        makeToast("success", "Successfully restore user");
+        axios
+          .post(`${api}/db/deleteRecycleData`, { UserID: selectedUser.UserID })
+          .then(() => {
+            fetchRecyleData();
+            setModalStatus((prev) => ({ ...prev, restoreModal: false }));
+          });
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      });
   };
   return (
     <Modal
@@ -53,6 +45,7 @@ const RestoreModal = ({ modalStatus, setModalStatus, selectedUser }) => {
       }
       isOpen={modalStatus.restoreModal}
       isCentered
+      size={"xl"}
     >
       <ModalOverlay />
       <ModalContent>
@@ -61,7 +54,7 @@ const RestoreModal = ({ modalStatus, setModalStatus, selectedUser }) => {
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack fontSize={"sm"} alignItems={"flex-start"} overflow={"clip"}>
+          <VStack alignItems={"flex-start"} overflow={"clip"}>
             <Text>Data will be restore to database</Text>
             <Divider />
             {Object.keys(selectedUser).map((list, i) => (
@@ -76,7 +69,11 @@ const RestoreModal = ({ modalStatus, setModalStatus, selectedUser }) => {
         </ModalBody>
         <ModalFooter>
           <HStack>
-            <Button colorScheme={"blue"} onClick={handleDeleteUser}>
+            <Button
+              colorScheme={"blue"}
+              onClick={handleDeleteUser}
+              disabled={currentUser.AccountType === "Member" ? true : false}
+            >
               Restore data
             </Button>
             <Button

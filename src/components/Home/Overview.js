@@ -13,12 +13,7 @@ import { OverviewItems } from "../../utlis/GlobalData";
 
 const Overview = () => {
   return (
-    <Flex
-      h={"100%"}
-      w={"100%"}
-      flexDirection={"column"}
-      gap={12}
-    >
+    <Flex w={"100%"} flexDirection={"column"} gap={12}>
       <HStack>
         <Text fontSize={"3xl"}>Overview</Text>
       </HStack>

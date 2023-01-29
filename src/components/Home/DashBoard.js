@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   HStack,
   Icon,
@@ -29,6 +30,8 @@ const DashBoard = () => {
 
   const location = useLocation();
   const { currentUser } = useDataContext();
+  console.log(currentUser);
+
   const currentUri = decodeURI(location.pathname);
 
   return (
@@ -46,14 +49,52 @@ const DashBoard = () => {
           px={6}
           h={"100%"}
           bg={"#212b36"}
-          color={"white"}
           boxShadow={"md"}
           justifyContent={"space-between"}
         >
-          <Text fontWeight={"bold"} fontSize={"xl"}>
+          <IconButton
+            // variant={"outline"}
+            display={{ base: "block", md: "none" }}
+            colorScheme={"gray"}
+            fontSize={"2xl"}
+            icon={<Icon as={IoMenu} />}
+            onClick={() => setToggleMenu((prev) => !prev)}
+          />
+          <Text
+            color={"white"}
+            fontWeight={"bold"}
+            fontSize={{ base: "lg", md: "xl" }}
+          >
             Admin Panal
           </Text>
-          <Text>Welcome : {currentUser.Username}</Text>
+          <Center
+            color={"white"}
+            w={{ base: 180, md: 600 }}
+            borderLeft={"1px"}
+            borderRight={"1px"}
+          >
+            {currentUser.AccountType === "Member" ? (
+              <marquee>
+                This is a View Only type account, you can't change any data but
+                you can download the availabe resource. For any query contact
+                with admin
+              </marquee>
+            ) : (
+              <Text>Welcome : {currentUser.Username}</Text>
+            )}
+          </Center>
+          <HStack gap={2}>
+            <IconButton
+              colorScheme={"blue"}
+              icon={<Icon fontSize={"xl"} as={IoPersonOutline} />}
+            />
+            <IconButton
+              pl={1}
+              colorScheme={"red"}
+              onClick={onOpen}
+              icon={<Icon fontSize={"xl"} as={IoLogOutOutline} />}
+            />
+          </HStack>
         </HStack>
       </Box>
       <Flex
@@ -102,50 +143,6 @@ const DashBoard = () => {
         </Box>
 
         <VStack flex={1} overflow={"auto"}>
-          <HStack
-            px={4}
-            py={2}
-            w={"100%"}
-            justifyContent={"space-between"}
-            bg={"gray.300"}
-            zIndex={1}
-          >
-            <IconButton
-              boxShadow={"md"}
-              fontSize={"xl"}
-              bg={"white"}
-              icon={<IoMenu />}
-              onClick={() => {
-                setToggleMenu((prev) => !prev);
-              }}
-            />
-            <Input
-              placeholder="Search"
-              bg={"white"}
-              boxShadow={"sm"}
-              size={"md"}
-            />
-
-            <HStack color={"white"}>
-              <IconButton
-                boxShadow={"md"}
-                bg={"#212B36"}
-                _hover={{ bg: "#313B46" }}
-                rounded={"full"}
-                onClick={onOpen}
-                icon={<Icon fontSize={"xl"} as={IoPersonOutline} />}
-              />
-              <IconButton
-                pl={1}
-                boxShadow={"md"}
-                bg={"#212B36"}
-                _hover={{ bg: "#313B46" }}
-                rounded={"full"}
-                onClick={onOpen}
-                icon={<Icon fontSize={"xl"} as={IoLogOutOutline} />}
-              />
-            </HStack>
-          </HStack>
           <Box
             w={"100%"}
             flex={1}
@@ -153,6 +150,7 @@ const DashBoard = () => {
             p={4}
             bg={"gray.50"}
             overflow={"auto"}
+            border={"2px solid #212b36"}
           >
             <Outlet />
           </Box>
@@ -164,7 +162,13 @@ const DashBoard = () => {
 };
 
 const ConfirmLogoutModal = ({ isOpen, onClose }) => {
-  const { SingOut } = useDataContext();
+  const { setCurrentUser } = useDataContext();
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setCurrentUser(null);
+  };
 
   return (
     <Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -175,7 +179,7 @@ const ConfirmLogoutModal = ({ isOpen, onClose }) => {
         <ModalBody>Are you sure you want to log out ?</ModalBody>
         <ModalFooter>
           <HStack>
-            <Button colorScheme={"red"} onClick={SingOut}>
+            <Button colorScheme={"red"} onClick={handleLogout}>
               Logout
             </Button>
             <Button onClick={onClose}>Close</Button>

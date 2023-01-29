@@ -10,41 +10,31 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { useDataContext } from "../../../contexts/DataContext";
+import { api } from "../../../utlis/GlobalData";
 
 const ConfirmPermanentDeleteModal = ({
   modalStatus,
   setModalStatus,
   selectedUser,
 }) => {
-  const { deleteRecycle, fetchrRecyleData } = useDataContext();
-  const toast = useToast();
+  const { makeToast, fetchRecyleData, currentUser } = useDataContext();
 
   const handleDeleteUser = () => {
-    deleteRecycle(selectedUser.UserID, ({ error, msg }) => {
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
+    axios
+      .post(`${api}/db/deleteRecycleData`, { UserID: selectedUser.UserID })
+      .then((res) => {
+        makeToast("success", "User moved to Recycle Bin");
+        fetchRecyleData();
         setModalStatus((prev) => ({ ...prev, permanentDeleteModal: false }));
-        toast({
-          title: "Success",
-          description: msg.message,
-          status: "success",
-          duration: 6000,
-          isClosable: true,
-        });
-        fetchrRecyleData();
-      }
-    });
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      });
   };
   return (
     <Modal
@@ -53,6 +43,7 @@ const ConfirmPermanentDeleteModal = ({
       }
       isOpen={modalStatus.permanentDeleteModal}
       isCentered
+      size={"xl"}
     >
       <ModalOverlay />
       <ModalContent>
@@ -61,7 +52,7 @@ const ConfirmPermanentDeleteModal = ({
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack fontSize={"sm"} alignItems={"flex-start"} overflow={"clip"}>
+          <VStack alignItems={"flex-start"} overflow={"clip"}>
             <Text>
               You are about to delete the user data Permanently, data will lost
               and this operation can't be undone
@@ -79,7 +70,11 @@ const ConfirmPermanentDeleteModal = ({
         </ModalBody>
         <ModalFooter>
           <HStack>
-            <Button colorScheme={"red"} onClick={handleDeleteUser}>
+            <Button
+              colorScheme={"red"}
+              onClick={handleDeleteUser}
+              disabled={currentUser.AccountType === "Member" ? true : false}
+            >
               Proceed to delete
             </Button>
             <Button

@@ -5,38 +5,40 @@ import {
   Image,
   Input,
   Text,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
+import axios from "axios";
 import React, { useState } from "react";
 import { useDataContext } from "../../contexts/DataContext";
 import loginImg from "../../images/login.jpg";
+import { api } from "../../utlis/GlobalData";
 
 const Login = () => {
   const [btnLoad, setBtnLoad] = useState(false);
   const [authData, setAuthData] = useState({
-    username: "",
+    Username: "",
     password: "",
   });
-
-  const { SignIn } = useDataContext();
-  const toast = useToast();
+  const { makeToast, setCurrentUser } = useDataContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setBtnLoad(true);
-    SignIn(authData, (error) => {
-      setBtnLoad(false);
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      }
-    });
+
+    axios
+      .post(`${api}/auth/login`, authData)
+      .then((res) => {
+        setCurrentUser(res.data.user);
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      })
+      .finally(() => {
+        setBtnLoad(false);
+      });
   };
 
   return (
@@ -56,11 +58,7 @@ const Login = () => {
       >
         <Image src={loginImg} flex={1} display={{ base: "none", md: "flex" }} />
         <VStack h={"100%"} py={8} w={"100%"} bg={"white"}>
-          <Text
-            fontSize={"2xl"}
-          >
-            Nippon Steel Engineering{" "}
-          </Text>
+          <Text fontSize={"2xl"}>Nippon Steel Engineering </Text>
           <Text fontSize={"4xl"}>Admin Login</Text>
           <VStack
             p={8}
@@ -77,12 +75,12 @@ const Login = () => {
                 placeholder="Username"
                 borderRadius={"full"}
                 textAlign={"center"}
-                value={authData.username}
+                value={authData.Username}
                 autoFocus
                 onChange={(e) => {
                   setAuthData((prev) => ({
                     ...prev,
-                    username: e.target.value,
+                    Username: e.target.value,
                   }));
                 }}
               />

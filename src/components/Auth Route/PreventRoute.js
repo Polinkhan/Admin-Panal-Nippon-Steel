@@ -4,7 +4,7 @@ import { useDataContext } from "../../contexts/DataContext";
 
 const PreventRoute = () => {
   const { currentUser } = useDataContext();
-  return currentUser ? <Navigate to="Dashboard" /> : <Outlet />;
+  return currentUser ? <Navigate to="Overview" /> : <Outlet />;
 };
 
 export default PreventRoute;

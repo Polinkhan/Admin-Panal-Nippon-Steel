@@ -11,9 +11,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useToast,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { useDataContext } from "../../../contexts/DataContext";
+import { api } from "../../../utlis/GlobalData";
 
 const EditUserModal = ({
   updatedUser,
@@ -21,32 +22,22 @@ const EditUserModal = ({
   modalStatus,
   setModalStatus,
 }) => {
-  const { updateUser, fetchUserAllData } = useDataContext();
-  const toast = useToast();
+  const { makeToast, fetchUserAllData, currentUser } = useDataContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateUser(updatedUser, ({ error, msg }) => {
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
-        setModalStatus((prev) => ({ ...prev, editModal: false }));
-        toast({
-          title: "Success",
-          description: msg.message,
-          status: "success",
-          duration: 6000,
-          isClosable: true,
-        });
+
+    axios
+      .post(`${api}/db/updateUser`, { userData: updatedUser })
+      .then((res) => {
         fetchUserAllData();
-      }
-    });
+        makeToast("success", res.data.msg.message);
+        setModalStatus((prev) => ({ ...prev, editModal: false }));
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      });
   };
 
   return (
@@ -54,6 +45,7 @@ const EditUserModal = ({
       onClose={() => setModalStatus((prev) => ({ ...prev, editModal: false }))}
       isOpen={modalStatus.editModal}
       isCentered
+      size={"xl"}
     >
       <ModalOverlay />
       <ModalContent as={"form"} onSubmit={handleSubmit}>
@@ -90,7 +82,12 @@ const EditUserModal = ({
         </ModalBody>
         <ModalFooter>
           <HStack>
-            <Button type="submit">Proceed to update</Button>
+            <Button
+              type="submit"
+              disabled={currentUser.AccountType === "Member" ? true : false}
+            >
+              Proceed to update
+            </Button>
             <Button
               onClick={() =>
                 setModalStatus((prev) => ({ ...prev, editModal: false }))

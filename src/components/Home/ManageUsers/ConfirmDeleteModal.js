@@ -10,38 +10,29 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { useDataContext } from "../../../contexts/DataContext";
+import { api } from "../../../utlis/GlobalData";
 
 const ConfirmDeleteModal = ({ modalStatus, setModalStatus, selectedUser }) => {
-  const { deleteUser, fetchUserAllData, fetchrRecyleData } = useDataContext();
-  const toast = useToast();
+  const { makeToast, fetchUserAllData, fetchRecyleData, currentUser } =
+    useDataContext();
 
   const handleDeleteUser = () => {
-    deleteUser(selectedUser, ({ error, msg }) => {
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
-        setModalStatus((prev) => ({ ...prev, deleteModal: false }));
-        toast({
-          title: "Success",
-          description: msg.message,
-          status: "success",
-          duration: 6000,
-          isClosable: true,
-        });
+    axios
+      .post(`${api}/db/deleteUser`, { UserData: selectedUser })
+      .then((res) => {
+        makeToast("success", "User moved to Recycle Bin");
+        fetchRecyleData();
         fetchUserAllData();
-        fetchrRecyleData();
-      }
-    });
+        setModalStatus((prev) => ({ ...prev, deleteModal: false }));
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      });
   };
   return (
     <Modal
@@ -50,13 +41,14 @@ const ConfirmDeleteModal = ({ modalStatus, setModalStatus, selectedUser }) => {
       }
       isOpen={modalStatus.deleteModal}
       isCentered
+      size={"xl"}
     >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Move to Recycle Bin</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack fontSize={"sm"} alignItems={"flex-start"} overflow={"clip"}>
+          <VStack alignItems={"flex-start"} overflow={"clip"}>
             <Text>
               You are about to delete the user, you can also retrive the data
               from Recycle bin, User can't log in into app if their data is in
@@ -75,7 +67,11 @@ const ConfirmDeleteModal = ({ modalStatus, setModalStatus, selectedUser }) => {
         </ModalBody>
         <ModalFooter>
           <HStack>
-            <Button colorScheme={"red"} onClick={handleDeleteUser}>
+            <Button
+              colorScheme={"red"}
+              onClick={handleDeleteUser}
+              disabled={currentUser.AccountType === "Member" ? true : false}
+            >
               Move to Recycle Bin
             </Button>
             <Button

@@ -7,66 +7,53 @@ import {
   HStack,
   Input,
   Text,
-  useToast,
   VStack,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import axios from "axios";
 import React, { useState } from "react";
 import { useDataContext } from "../../../contexts/DataContext";
-import { userDataKeys } from "../../../utlis/GlobalData";
+import { api, userDataKeys } from "../../../utlis/GlobalData";
 const RegisterUser = () => {
   const userDataKeys_ = userDataKeys.filter(({ itemName }) =>
     itemName === "Password" || itemName === "UserID" ? "" : itemName
   );
-  const inputInitialData = [
-    { UserID: "", Password: "" },
-    {
-      "Employee Name": "",
-      Email: "",
-      "Date Of Birth": "",
-      Company: "",
-      "Job Title": "",
-      "Joining Date": "",
-      Mobile: "",
-      Nationality: "",
-      Type: "",
-    },
-  ];
+  const inputInitialData = {
+    UserID: "",
+    Password: "",
+    "Employee Name": "",
+    Email: "",
+    "Date Of Birth": "",
+    Company: "",
+    "Job Title": "",
+    "Joining Date": "",
+    Mobile: "",
+    Nationality: "",
+    Type: "",
+    PrimaryBankAcc: "",
+    SecondaryBankAcc: "",
+  };
 
-  const [userAuth, setUserAuth] = useState(inputInitialData[0]);
-  const [userInfo, setUserInfo] = useState(inputInitialData[1]);
-  const { createUser, fetchUserAllData } = useDataContext();
-  const toast = useToast();
+  const [user, setUser] = useState(inputInitialData);
+  const { fetchUserAllData, makeToast, currentUser } = useDataContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createUser(userAuth, userInfo, ({ error, msg }) => {
-      if (error) {
-        toast({
-          title: "Error !!",
-          description: error.message,
-          status: "error",
-          duration: 6000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: msg.message,
-          status: "success",
-          duration: 6000,
-          isClosable: true,
-        });
-        setUserAuth({ ...inputInitialData[0] });
-        setUserInfo({ ...inputInitialData[1] });
+    axios
+      .post(`${api}/db/createUser`, { user })
+      .then((res) => {
+        makeToast("success", res.data.msg.message);
         fetchUserAllData();
-      }
-    });
+      })
+      .catch((err) => {
+        const msg = err.response.data.error.message || err.message;
+        makeToast("error", msg);
+      });
   };
 
   return (
-    <Flex h={"100%"} w={"100%"} flexDirection={"column"} gap={6}>
+    <Flex w={"100%"} flexDirection={"column"} gap={6}>
       <HStack>
         <Text fontSize={"2xl"}>Register User, Create a new user</Text>
       </HStack>
@@ -82,9 +69,9 @@ const RegisterUser = () => {
                 <Input
                   bg={"white"}
                   required
-                  value={userAuth.UserID}
+                  value={user.UserID}
                   onChange={(e) => {
-                    setUserAuth((prev) => ({
+                    setUser((prev) => ({
                       ...prev,
                       UserID: e.target.value,
                     }));
@@ -100,9 +87,9 @@ const RegisterUser = () => {
                 <Input
                   bg={"white"}
                   required
-                  value={userAuth.Password}
+                  value={user.Password}
                   onChange={(e) => {
-                    setUserAuth((prev) => ({
+                    setUser((prev) => ({
                       ...prev,
                       Password: e.target.value,
                     }));
@@ -123,9 +110,9 @@ const RegisterUser = () => {
                     bg={"white"}
                     type={list.type}
                     required
-                    value={userInfo[list.itemName]}
+                    value={user[list.itemName]}
                     onChange={(e) => {
-                      setUserInfo((prev) => ({
+                      setUser((prev) => ({
                         ...prev,
                         [list.itemName]: e.target.value,
                       }));
@@ -135,7 +122,11 @@ const RegisterUser = () => {
               </WrapItem>
             ))}
           </Wrap>
-          <Button colorScheme={"linkedin"} type="submit">
+          <Button
+            colorScheme={"linkedin"}
+            type="submit"
+            disabled={currentUser.AccountType === "Member" ? true : false}
+          >
             Submit
           </Button>
         </VStack>

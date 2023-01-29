@@ -4,7 +4,6 @@ import {
   Flex,
   HStack,
   IconButton,
-  Input,
   StackDivider,
   Text,
   VStack,
@@ -18,9 +17,8 @@ import ConfirmPermanentDeleteModal from "./ConfirmPermanentDeleteModal";
 import RestoreModal from "./RestoreModal";
 
 const Recyclebin = () => {
-  const { recyclebinData, fetchrRecyleData } = useDataContext();
+  const { recyclebinData, fetchRecyleData } = useDataContext();
   const [selectedUser, setSelectedUser] = useState({});
-  //   const [updatedUser, setUpdatedUser] = useState({});
   const [modalStatus, setModalStatus] = useState({
     restoreModal: false,
     permanentDeleteModal: false,
@@ -42,7 +40,7 @@ const Recyclebin = () => {
           colorScheme={"facebook"}
           rightIcon={<IoRefresh />}
           fontSize={{ base: "sm", md: "md" }}
-          onClick={() => fetchrRecyleData()}
+          onClick={() => fetchRecyleData()}
         >
           Refresh
         </Button>
@@ -53,23 +51,17 @@ const Recyclebin = () => {
         overflow={"auto"}
         divider={<StackDivider />}
         color={"gray.600"}
+        alignItems={"flex-start"}
       >
         <HStack
           p={2}
-          w={"100%"}
+          // w={"100%"}
           justifyContent={"space-between"}
-          fontSize={"xs"}
+          fontSize={{ base: "sm", "2xl": "md" }}
           divider={<StackDivider />}
         >
           {userDataKeys.map((list, i) => (
-            <Text
-              textAlign={"center"}
-              w={list.width}
-              minW={list.width}
-              key={i}
-              fontWeight={"bold"}
-              fontSize={{ base: "xs", "2xl": "sm" }}
-            >
+            <Text textAlign={"center"} w={32} key={i} fontWeight={"bold"}>
               {list.itemName}
             </Text>
           ))}
@@ -82,8 +74,7 @@ const Recyclebin = () => {
           recyclebinData.map((userData, i) => (
             <HStack
               key={i}
-              fontSize={{ base: "xs", "2xl": "sm" }}
-              w={"100%"}
+              fontSize={{ base: "sm", "2xl": "md" }}
               justifyContent={"space-between"}
               p={2}
               cursor={"pointer"}
@@ -93,8 +84,7 @@ const Recyclebin = () => {
               {userDataKeys.map((keylist, i) => (
                 <Text
                   textAlign={"center"}
-                  w={keylist.width}
-                  minW={keylist.width}
+                  w={32}
                   key={i + "a"}
                   whiteSpace={"nowrap"}
                   overflow={"hidden"}

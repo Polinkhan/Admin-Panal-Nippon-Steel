@@ -83,22 +83,16 @@ const ManageUser = () => {
           divider={<StackDivider />}
           color={"gray.600"}
           flex={1}
+          alignItems={"flex-start"}
         >
           <HStack
             p={2}
-            w={"100%"}
             justifyContent={"space-between"}
-            fontSize={{ base: "xs", "2xl": "sm" }}
+            fontSize={{ base: "sm", "2xl": "md" }}
             divider={<StackDivider />}
           >
             {userDataKeys.map((list, i) => (
-              <Text
-                textAlign={"center"}
-                w={list.width}
-                minW={list.width}
-                key={i}
-                fontWeight={"bold"}
-              >
+              <Text textAlign={"center"} w={32} key={i} fontWeight={"bold"}>
                 {list.itemName}
               </Text>
             ))}
@@ -110,7 +104,7 @@ const ManageUser = () => {
             userAllData.map((userData, i) => (
               <HStack
                 key={i}
-                fontSize={{ base: "xs", "2xl": "sm" }}
+                fontSize={{ base: "sm", "2xl": "md" }}
                 w={"100%"}
                 justifyContent={"space-between"}
                 p={2}
@@ -121,8 +115,7 @@ const ManageUser = () => {
                 {userDataKeys.map((keylist, i) => (
                   <Text
                     textAlign={"center"}
-                    w={keylist.width}
-                    minW={keylist.width}
+                    w={32}
                     key={i + "a"}
                     whiteSpace={"nowrap"}
                     overflow={"hidden"}
